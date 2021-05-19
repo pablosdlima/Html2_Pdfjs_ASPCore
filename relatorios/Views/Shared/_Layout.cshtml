@@ -1,0 +1,107 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] - relatorios</title>
+    <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
+    <link rel="stylesheet" href="~/css/site.css" />
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
+            <div class="container">
+                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">relatorios</a>
+                <button class="navbar-toggler" type="button" data-toggle="collapse" data-target=".navbar-collapse" aria-controls="navbarSupportedContent"
+                        aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="navbar-collapse collapse d-sm-inline-flex flex-sm-row-reverse">
+                    <ul class="navbar-nav flex-grow-1">
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Testes" asp-action="Create">Create</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Testes" asp-action="Index">Index</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link text-dark" asp-area="" asp-controller="Testes" asp-action="relatorio">Relatorios</a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <div class="container">
+        <main role="main" class="pb-3">
+            @RenderBody()
+        </main>
+    </div>
+
+    <footer class="border-top footer text-muted">
+        <div class="container">
+            &copy; 2021 - relatorios - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+        </div>
+    </footer>
+    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    <script src="~/js/html2pdf.bundle.min.js"></script>
+
+    <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="~/js/site.js" asp-append-version="true"></script>
+
+    <script>
+        function pdf() {
+            var element = document.getElementById("element");
+            var data = new Date();
+            var tempo = data.getDate() + '/' + (data.getMonth() + 1) + '/' + data.getFullYear() + ' ' + data.getHours() + ': ' + data.getMinutes();
+
+            html2pdf()
+                .from(element)
+                .set({
+                    margin: [45,45,45,45],
+                    filename: 'arquivo.pdf',
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { dpi: 96, scale: 1, scrollX: 0, scrollY: 0, backgroundColor: '#FFF' },
+                    jsPDF: { unit: 'pt', format: 'a4', orientation: 'p' }, //formato de page
+                    pagebreak: { before: '.page-break', avoid: 'img' } //quebra de pagina
+                })
+                .toPdf()
+                .get('pdf').then(function (pdf) { //rodape e cabeçalho.
+                    var totalPages = pdf.internal.getNumberOfPages();
+
+                    for (let i = 1; i <= totalPages; i++) {
+                        pdf.setPage(i);
+                        pdf.setFontSize(10);
+                        pdf.setTextColor(150);
+                        pdf.text('Pagina ' + i + ' de ' + totalPages, pdf.internal.pageSize.getWidth() - 100, pdf.internal.pageSize.getHeight() - 10);
+                        pdf.text(`Gerado em: ${tempo.toString('YYYY - MM - DDTHH - mm')}`, pdf.internal.pageSize.getWidth() - 200, pdf.internal.pageSize.getHeight() - 800);
+                    }
+                }).save();
+        }
+    </script>
+
+    @RenderSection("Scripts", required: false)
+</body>
+</html>
+
+
+ @*function pdf() {
+            var element = document.getElementById("element");
+            var opt = {
+                margin: 1,
+                filename: 'arquivo.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, logging: true, dpi: 192, letterRendering: true },
+                jsPDF: { unit: 'in', format: 'A4', orientation: 'portrait' },
+                pagebreak: { before: '.beforeClass', after: ['#after1', '#after2'], avoid: 'img'},
+
+            };
+
+            html2pdf().set(opt).from(element).save();
+        }*@  
